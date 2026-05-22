@@ -5,7 +5,7 @@ An FPGA-accelerated High-Frequency Trading reference design on the Xilinx Zynq-7
 ## Project Phases
 
 - **Phase 1 (in progress):** Pipelined RTL decoder for the NASDAQ ITCH 5.0 market data protocol, packaged as a reusable AXI-Stream IP.
-- **Phase 2 (planned):** Hardware order book integrated with the decoder; HW-vs-SW benchmark; submission to IEEE FCCM / FPL / FPT.
+- **Phase 2 (planned):** Hardware order book integrated with the decoder; HW-vs-SW benchmark.
 
 ## Repository Structure
 
