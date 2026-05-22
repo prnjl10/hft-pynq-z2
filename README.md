@@ -27,5 +27,5 @@ An FPGA-accelerated High-Frequency Trading reference design on the Xilinx Zynq-7
 
 ## Status
 
-Phase 1 in progress — ITCH 5.0 decoder design.
+Phase 1: ITCH 5.0 decoder design.
 
