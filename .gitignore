@@ -42,3 +42,7 @@ Thumbs.db
 *.xsa
 *.elf
 
+
+# === Generated golden-reference output ===
+golden_model/output/
+
