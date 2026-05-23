@@ -25,7 +25,7 @@ Generated from the first **100,000 messages** of `20190730.BX_ITCH_50.gz`
 | `itch_P.csv` | Trade (non-cross) | 63 | ✅ |
 
 The two larger files (`itch_A.csv`, `itch_D.csv`) are gitignored to keep the
-repo lean. They are fully regenerable — see below.
+repo lean. They are fully regenerable (see below)
 
 ## Regenerating
 
