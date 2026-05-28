@@ -1,0 +1,45 @@
+`timescale 1ns / 1ps
+
+module itch_decoder_d(
+    input logic clk,
+    input logic rst_n,
+    input logic [7:0] data_dec, //from header parser's data bus
+    input logic valid_D,        //from header parser's gate signal
+    
+    output logic [15:0] stock_locate,
+    output logic [15:0] tracking_number,
+    output logic [47:0] timestamp,
+    output logic [63:0] order_ref_num,
+    output logic decoded_valid   //1-cycle pulse on last byte
+);
+
+logic [4:0] byte_count;
+
+assign decoded_valid = valid_D && (byte_count == 5'd18);
+
+always_ff @(posedge clk) begin
+    if (!rst_n) begin
+        byte_count <= 5'd0;
+        stock_locate     <= 16'd0;
+        tracking_number  <= 16'd0;
+        timestamp        <= 48'd0;
+        order_ref_num    <= 64'd0;
+    end else if (valid_D) begin
+        byte_count <= byte_count + 5'd1;
+        case (byte_count)
+            5'd0:    $display("[%0t] decoder_d: type byte 0x%h ignored", $time, data_dec); // byte 0 is the type byte 'S' - IGNORE, no field to update
+            5'd1, 5'd2:            
+                stock_locate    <= {stock_locate[7:0],    data_dec};
+            5'd3, 5'd4:            
+                tracking_number <= {tracking_number[7:0], data_dec};
+            5'd5, 5'd6, 5'd7, 5'd8, 5'd9, 5'd10:     
+                timestamp       <= {timestamp[39:0],      data_dec};
+            5'd11, 5'd12, 5'd13, 5'd14, 5'd15, 5'd16, 5'd17, 5'd18:                 
+                order_ref_num   <= {order_ref_num [55:0], data_dec};  
+            default: $display("[%0t] decoder_d: unexpected byte_count=%0d", $time, byte_count); // no-op
+        endcase
+    end else begin
+        byte_count <= 5'd0;
+    end
+end
+endmodule
