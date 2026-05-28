@@ -90,6 +90,7 @@ EDGE CASES:
 - **Latency.** Zero pipeline stages added - outputs respond combinationally to 
   current state and inputs. Adding the block doesn't increase end-to-end latency.: ?
 */
+`timescale 1ns / 1ps
 
 module itch_header_parser (
 

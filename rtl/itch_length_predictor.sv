@@ -1,4 +1,4 @@
-cd /c/projects/hft-pynq-z2/rtl
+
 /*=============================================================================
  * itch_length_predictor.sv
  *
@@ -20,7 +20,7 @@ cd /c/projects/hft-pynq-z2/rtl
  *
  * See: docs/phase1_rtl_architecture.md, Section 9
  *===========================================================================*/
-
+`timescale 1ns / 1ps
 module itch_length_predictor (
     input  logic       clk,
     input  logic       rst_n,      // Active-low synchronous reset
@@ -231,7 +231,12 @@ module itch_length_predictor (
         end
     end
 
-endmodule     * At every rising clock edge:
+endmodule
+
+/*At every rising clock edge:
+
+
+
      *   - If reset is active (rst_n=0), force state to WAIT_LEN_HI
      *   - Otherwise, capture whatever next_state currently is
      * SEQUENTIAL BLOCK 1: The state register
@@ -240,5 +245,4 @@ endmodule     * At every rising clock edge:
      * body_valid goes HIGH in the same instant — aligned with the byte that
      * caused the transition. There is NO 1-cycle delay.
      *=======================================================================*/
-
 
