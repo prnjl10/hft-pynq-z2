@@ -94,7 +94,7 @@ module itch_length_predictor (
      *   - The FSM is currently in the STREAM_BODY state, AND
      *   - The current incoming byte is valid (valid_in = 1).
      *
-     * time. The moment `state` becomes STREAM_BODY (at a clock edge),
+     * time. The moment `state` becomes STREAM_BODY (at a clock edge). */
     assign body_valid = (state == STREAM_BODY) && valid_in;
 
     /*=========================================================================
@@ -233,16 +233,5 @@ module itch_length_predictor (
 
 endmodule
 
-/*At every rising clock edge:
 
-
-
-     *   - If reset is active (rst_n=0), force state to WAIT_LEN_HI
-     *   - Otherwise, capture whatever next_state currently is
-     * SEQUENTIAL BLOCK 1: The state register
-     *
-     * This is the actual flip-flop that holds the FSM state. It updates ONLY
-     * body_valid goes HIGH in the same instant — aligned with the byte that
-     * caused the transition. There is NO 1-cycle delay.
-     *=======================================================================*/
 

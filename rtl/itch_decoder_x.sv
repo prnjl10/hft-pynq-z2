@@ -3,47 +3,52 @@
 module itch_decoder_x(
     input logic clk,
     input logic rst_n,
-    input logic [7:0] data_dec, //from header parser's data bus
-    input logic valid_X,        //from header parser's gate signal
+    input logic [7:0] data_dec,
+    input logic valid_X,
     
     output logic [15:0] stock_locate,
     output logic [15:0] tracking_number,
     output logic [47:0] timestamp,
     output logic [63:0] order_ref_num,
     output logic [31:0] cancelled_shares,
-    output logic decoded_valid   //1-cycle pulse on last byte
+    output logic decoded_valid
 );
 
 logic [4:0] byte_count;
+logic decoded_valid_reg;
 
-assign decoded_valid = valid_X && (byte_count == 5'd22);
+// BUG: assign decoded_valid = valid_X && (byte_count == 5'd22);
+// WHY IT WAS WRONG: decoded_valid fired combinationally in the same cycle the last
+// cancelled_shares byte arrived. Non-blocking assignments (<=) don't update until END
+// of that clock edge, so TB sampled OLD cancelled_shares - missing final byte (0x50).
+// FIX: Use a registered decoded_valid_reg inside always_ff. It gets set when byte_count==22,
+// and pulses HIGH on the NEXT cycle - by which time cancelled_shares is fully latched.
+assign decoded_valid = decoded_valid_reg;
 
 always_ff @(posedge clk) begin
     if (!rst_n) begin
-        byte_count <= 5'd0;
-        stock_locate     <= 16'd0;
-        tracking_number  <= 16'd0;
-        timestamp        <= 48'd0;
-        order_ref_num    <= 64'd0;
-        cancelled_shares <= 32'd0;
+        byte_count        <= 5'd0;
+        decoded_valid_reg <= 1'b0;
+        stock_locate      <= 16'd0;
+        tracking_number   <= 16'd0;
+        timestamp         <= 48'd0;
+        order_ref_num     <= 64'd0;
+        cancelled_shares  <= 32'd0;
     end else if (valid_X) begin
-        byte_count <= byte_count + 5'd1;
+        byte_count        <= byte_count + 5'd1;
+        decoded_valid_reg <= (byte_count == 5'd22); // pulses cycle AFTER last byte is latched
         case (byte_count)
-            5'd0:    $display("[%0t] decoder_x: type byte 0x%h ignored", $time, data_dec); // byte 0 is the type byte 'S' - IGNORE, no field to update
-            5'd1, 5'd2:            
-                stock_locate    <= {stock_locate[7:0],    data_dec};
-            5'd3, 5'd4:            
-                tracking_number <= {tracking_number[7:0], data_dec};
-            5'd5, 5'd6, 5'd7, 5'd8, 5'd9, 5'd10:     
-                timestamp       <= {timestamp[39:0],      data_dec};
-            5'd11, 5'd12, 5'd13, 5'd14, 5'd15, 5'd16, 5'd17, 5'd18:                 
-                order_ref_num   <= {order_ref_num [55:0], data_dec};  
-            5'd19, 5'd20, 5'd21, 5'd22:
-                cancelled_shares <= {cancelled_shares [23:0], data_dec};
-            default: $display("[%0t] decoder_x: unexpected byte_count=%0d", $time, byte_count); // no-op
+            5'd0: $display("[%0t] decoder_x: type byte 0x%h ignored", $time, data_dec);
+            5'd1, 5'd2:   stock_locate    <= {stock_locate[7:0], data_dec};
+            5'd3, 5'd4:   tracking_number <= {tracking_number[7:0], data_dec};
+            5'd5, 5'd6, 5'd7, 5'd8, 5'd9, 5'd10: timestamp <= {timestamp[39:0], data_dec};
+            5'd11, 5'd12, 5'd13, 5'd14, 5'd15, 5'd16, 5'd17, 5'd18: order_ref_num <= {order_ref_num[55:0], data_dec};
+            5'd19, 5'd20, 5'd21, 5'd22: cancelled_shares <= {cancelled_shares[23:0], data_dec};
+            default: $display("[%0t] decoder_x: unexpected byte_count=%0d", $time, byte_count);
         endcase
     end else begin
-        byte_count <= 5'd0;
+        byte_count        <= 5'd0;
+        decoded_valid_reg <= 1'b0; // clear when no longer routing X bytes
     end
 end
 endmodule
