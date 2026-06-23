@@ -1,48 +1,15 @@
-# === Large data files ===
+# Vivado wave config files
+*.wcfg
+
+# Docs not for public repo
+docs/phase1_bug_report.pdf
+docs/phase1_progress_report.pdf
+docs/phase1_system_reference.md
+docs/V2_ possible extension.pdf
+docs/Phase 1 — System Reference & FSM Appendix.pdf
+
+# Large data files
 data/
-*.gz
-*.NASDAQ_ITCH50
-*.BX_ITCH_50
-*.PSX_ITCH_50
-*.pcap
 
-# === Vivado / Xilinx generated files ===
+# Vivado project (regenerable)
 vivado/
-*.jou
-*.log
-*.str
-*.cache/
-*.hw/
-*.ip_user_files/
-*.runs/
-*.sim/
-*.gen/
-*.xpr.backup
-.Xil/
-
-# === Python ===
-__pycache__/
-*.pyc
-*.pyo
-.venv/
-venv/
-.ipynb_checkpoints/
-
-# === Editor / OS junk ===
-.vscode/
-.idea/
-*.swp
-Thumbs.db
-.DS_Store
-
-# === Build artifacts ===
-*.bit
-*.bin
-*.hdf
-*.xsa
-*.elf
-
-
-# === Generated golden-reference output ===
-golden_model/output/
-
