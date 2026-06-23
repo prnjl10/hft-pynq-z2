@@ -13,3 +13,4 @@ data/
 
 # Vivado project (regenerable)
 vivado/
+golden_model/output/
